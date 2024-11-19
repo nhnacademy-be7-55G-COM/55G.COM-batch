@@ -1,4 +1,13 @@
 spring:
+  profiles:
+    active: default
+
+  application:
+    name: batch-service
+
+  config:
+    import: optional:configserver:http://localhost:9000
+
   datasource:
     url: jdbc:mysql://localhost:3306/minidoo
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,3 +25,19 @@ spring:
   batch:
     job:
       enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: live
+
+    import: optional:configserver:http://55g-config-live:9000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+    import: optional:configserver:http://55g-config-dev:9050
