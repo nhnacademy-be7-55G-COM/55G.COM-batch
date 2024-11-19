@@ -39,6 +39,6 @@ public class BirthSchedule {
             .addString("date", date)
             .toJobParameters();
 
-        jobLauncher.run(jobRegistry.getJob("birthJob"), jobParameters);
+        jobLauncher.run(jobRegistry.getJob("couponJob"), jobParameters);
     }
 }

@@ -10,9 +10,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.data.RepositoryItemReader;
-import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
-import org.springframework.batch.item.data.builder.RepositoryItemWriterBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort.Direction;
@@ -45,7 +43,7 @@ public class BirthConfig {
     @Bean
     public Job birthJob() {
 
-        return new JobBuilder("birthJob", jobRepository)
+        return new JobBuilder("couponJob", jobRepository)
             .start(birthStep())
             .build();
     }
@@ -61,10 +59,13 @@ public class BirthConfig {
             .<Member, Member> chunk(10, transactionManager)
             .reader(readMemberBirth())
             .processor(processBirthCoupon())
-            .writer(writeMemberBirth())
             .build();
     }
 
+    /**
+     * 해당 월의 생일인 Member 읽기 - read
+     * @return
+     */
     @Bean
     public RepositoryItemReader<Member> readMemberBirth() {
 
@@ -81,6 +82,10 @@ public class BirthConfig {
             .build();
     }
 
+    /**
+     * 해당 월의 생일자에게 쿠폰 넣어주기 - processor
+     * @return
+     */
     @Bean
     public ItemProcessor<Member, Member> processBirthCoupon() {
 
@@ -91,14 +96,5 @@ public class BirthConfig {
 
             return item;
         };
-    }
-
-    @Bean
-    public RepositoryItemWriter<Member> writeMemberBirth() {
-
-        return new RepositoryItemWriterBuilder<Member>()
-            .repository(memberRepository)
-            .methodName("save")
-            .build();
     }
 }
