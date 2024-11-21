@@ -64,7 +64,6 @@ public class BirthConfig {
 
     /**
      * 해당 월의 생일인 Member 읽기 - read
-     * @return
      */
     @Bean
     public RepositoryItemReader<Member> readMemberBirth() {
@@ -83,8 +82,7 @@ public class BirthConfig {
     }
 
     /**
-     * 해당 월의 생일자에게 쿠폰 넣어주기 - processor
-     * @return
+     * 해당 월의 생일자에게 각각 쿠폰 생성 - processor
      */
     @Bean
     public ItemProcessor<Member, Member> processBirthCoupon() {
@@ -97,4 +95,9 @@ public class BirthConfig {
             return item;
         };
     }
+
+    /**
+     * 해당 월의 생일자 쿠폰함에 넣어주기 - writer
+     */
+    // Writer
 }
