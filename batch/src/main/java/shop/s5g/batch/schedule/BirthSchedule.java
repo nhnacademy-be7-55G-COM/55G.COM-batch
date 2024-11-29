@@ -27,9 +27,7 @@ public class BirthSchedule {
      * cron - 매 달 1일 자정 00시 00분 00초에 스케쥴 실행
      * @throws Exception
      */
-//    @Scheduled(cron = "0 0 0 1 * *",zone = "Asia/Seoul")
-
-    @Scheduled(cron = "0 0/1 * * * ?",zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 0 1 * *",zone = "Asia/Seoul")
     public void runBirthJob() throws Exception {
 
         log.info("Start Birth Job");
