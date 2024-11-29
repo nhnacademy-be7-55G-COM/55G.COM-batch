@@ -50,4 +50,6 @@ public class Member {
 
     @Setter
     private Long point;
+
+    private String paycoIdNo;
 }
