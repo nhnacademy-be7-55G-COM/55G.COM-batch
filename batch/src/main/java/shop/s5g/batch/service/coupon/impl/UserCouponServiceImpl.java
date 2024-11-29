@@ -1,5 +1,7 @@
 package shop.s5g.batch.service.coupon.impl;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,10 @@ public class UserCouponServiceImpl implements UserCouponService {
 
         Coupon coupon = couponService.createBirthCoupon();
 
-        userCouponRepository.save(new UserCoupon(member, coupon));
+        LocalDateTime now = LocalDateTime.now();
+        YearMonth yearMonth = YearMonth.from(now);
+        LocalDateTime lastDayOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        userCouponRepository.save(new UserCoupon(member, coupon, now, lastDayOfMonth));
     }
 }

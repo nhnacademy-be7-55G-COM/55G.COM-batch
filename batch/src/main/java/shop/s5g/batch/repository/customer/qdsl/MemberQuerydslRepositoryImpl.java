@@ -4,6 +4,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,12 +29,19 @@ public class MemberQuerydslRepositoryImpl extends QuerydslRepositorySupport impl
 
         List<Member> memberList = queryFactory
             .selectFrom(member)
-            .where(Expressions.stringTemplate("substring({0}, 5, 2)", member.birth)
-                .eq(formattedMonth))
+            .where(Expressions.stringTemplate("substring({0}, 5, 2)", member.birth).eq(formattedMonth))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
 
-        return new PageImpl<>(memberList, pageable, memberList.size());
+        Long total = queryFactory
+            .select(member.count())
+            .from(member)
+            .where(Expressions.stringTemplate("substring({0}, 5, 2)", member.birth).eq(formattedMonth))
+            .fetchOne();
+
+        long totalCnt = Objects.isNull(total) ? 0 : total;
+
+        return new PageImpl<>(memberList, pageable, totalCnt);
     }
 }

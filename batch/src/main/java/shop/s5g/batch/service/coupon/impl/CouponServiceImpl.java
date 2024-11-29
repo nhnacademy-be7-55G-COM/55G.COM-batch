@@ -33,16 +33,10 @@ public class CouponServiceImpl implements CouponService {
             throw new CouponTemplateNotFoundException("해당 쿠폰 템플릿이 존재하지 않습니다.");
         }
 
-        // 쿠폰의 만료일을 해당 월의 마지막 일로 설정
-        LocalDateTime now = LocalDateTime.now();
-        YearMonth yearMonth = YearMonth.from(now);
-        LocalDateTime lastDayOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
-
         return couponRepository.save(
             new Coupon(
                 birthTemplate,
-                createCouponNumber(),
-                lastDayOfMonth
+                createCouponNumber()
             )
         );
     }

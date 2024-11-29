@@ -7,6 +7,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,10 +33,19 @@ public class UserCoupon {
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
-    public UserCoupon(Member member, Coupon coupon) {
+    private LocalDateTime createdAt;
+
+    private LocalDateTime expiredAt;
+
+    private LocalDateTime usedAt;
+
+    public UserCoupon(Member member, Coupon coupon, LocalDateTime createdAt, LocalDateTime expiredAt) {
         this.member = member;
         this.coupon = coupon;
         this.userCouponPk = new UserCouponPk(member.getId(), coupon.getCouponId());
+        this.createdAt = createdAt;
+        this.expiredAt = expiredAt;
+        this.usedAt = null;
     }
 }
 

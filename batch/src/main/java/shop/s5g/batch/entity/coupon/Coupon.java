@@ -34,20 +34,10 @@ public class Coupon {
     private String couponCode;
 
     @NotNull
-    private LocalDateTime createdAt;
-
-    private LocalDateTime expiredAt;
-
-    private LocalDateTime usedAt;
-
-    @NotNull
     private boolean active;
 
-    public Coupon(CouponTemplate couponTemplate, String couponCode, LocalDateTime expiredAt) {
+    public Coupon(CouponTemplate couponTemplate, String couponCode) {
         this.couponTemplate = couponTemplate;
         this.couponCode = couponCode;
-        this.expiredAt = expiredAt;
-        this.createdAt = LocalDateTime.now();
-        this.active = true;
     }
 }

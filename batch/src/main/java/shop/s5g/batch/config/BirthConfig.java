@@ -9,6 +9,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +44,7 @@ public class BirthConfig {
     @Bean
     public Job birthJob() {
 
-        return new JobBuilder("couponJob", jobRepository)
+        return new JobBuilder("birthJob", jobRepository)
             .start(birthStep())
             .build();
     }
@@ -59,6 +60,7 @@ public class BirthConfig {
             .<Member, Member> chunk(10, transactionManager)
             .reader(readMemberBirth())
             .processor(processBirthCoupon())
+            .writer(writeProcessedBirthMembers())
             .build();
     }
 
@@ -88,10 +90,12 @@ public class BirthConfig {
     public ItemProcessor<Member, Member> processBirthCoupon() {
 
         return item -> {
+            if (item.getBirth() == null) {
+                log.warn("Skipping Member due to missing or invalid birth data: {}", item);
+                return null;
+            }
             log.info("Processing Member with ID : {}, Birth Date : {}", item.getId(), item.getBirth());
-
             userCouponService.createBirthCoupon(item);
-
             return item;
         };
     }
@@ -99,5 +103,12 @@ public class BirthConfig {
     /**
      * 해당 월의 생일자 쿠폰함에 넣어주기 - writer
      */
-    // Writer
+    @Bean
+    public ItemWriter<Member> writeProcessedBirthMembers() {
+        return items -> {
+            for (Member item : items) {
+                log.info("Writing Member with ID : {}", item.getId());
+            }
+        };
+    }
 }
