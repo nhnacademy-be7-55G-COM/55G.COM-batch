@@ -47,7 +47,8 @@ public class BirthConfig {
 
     public BirthConfig(JobRepository jobRepository, PlatformTransactionManager transactionManager,
         SharedData<List<Member>> sharedData,
-        UserCouponRepository userCouponRepository, MemberRepository memberRepository, CouponService couponService) {
+        UserCouponRepository userCouponRepository, MemberRepository memberRepository,
+        CouponService couponService) {
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.sharedData = sharedData;
@@ -58,6 +59,7 @@ public class BirthConfig {
 
     /**
      * 생일자 조회해서 쿠폰 발급해주는 Job
+     *
      * @return
      */
     @Bean
@@ -71,13 +73,14 @@ public class BirthConfig {
 
     /**
      * 모든 멤버 조회 후 생일자들만 골라 내는 작업 - Step
+     *
      * @return Step
      */
     @Bean
     @JobScope
     public Step birthMemberReadStep() {
         return new StepBuilder("birthMemberRead", jobRepository)
-            .<Member, Member> chunk(CHUNK_SIZE, transactionManager)
+            .<Member, Member>chunk(CHUNK_SIZE, transactionManager)
             .reader(memberReader())
             .writer(birthMemberWriter())
             .build();
@@ -85,6 +88,7 @@ public class BirthConfig {
 
     /**
      * 모든 멤버 조회 - Reader
+     *
      * @return Member
      */
     @Bean
@@ -112,13 +116,14 @@ public class BirthConfig {
 
     /**
      * 골라낸 생일자들을 대상으로 생일쿠폰을 넣어주는 작업 - Step
+     *
      * @return Step
      */
     @Bean
     @JobScope
     public Step birthCouponProcessStep() {
         return new StepBuilder("birthCouponProcess", jobRepository)
-            .<Member, UserCoupon> chunk(CHUNK_SIZE, transactionManager)
+            .<Member, UserCoupon>chunk(CHUNK_SIZE, transactionManager)
             .reader(birthMemberReader())
             .processor(birthCouponIssuedProcessor())
             .writer(birthCouponWriter())
@@ -130,7 +135,8 @@ public class BirthConfig {
     public ItemReader<Member> birthMemberReader() {
         return new ItemReader<>() {
 
-            private final Iterator<Member> memberIterator = sharedData.get("birthMember").iterator();
+            private final Iterator<Member> memberIterator = sharedData.get("birthMember")
+                .iterator();
 
             @Override
             public Member read() {
@@ -153,7 +159,8 @@ public class BirthConfig {
 
         return member -> {
             if (userCouponRepository.hasBirthdayCoupon(member)) {
-                log.warn("Member with ID {} already has a birthday coupon. Skipping.", member.getId());
+                log.warn("Member with ID {} already has a birthday coupon. Skipping.",
+                    member.getId());
                 return null;
             }
 
@@ -180,81 +187,4 @@ public class BirthConfig {
             }
         };
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    /**
-//     * 생일 체크 batch Step
-//     * @return
-//     */
-//    @Bean
-//    public Step birthStep() {
-//
-//        return new StepBuilder("birthStep", jobRepository)
-//            .<Member, Member> chunk(10, transactionManager)
-//            .reader(readMemberBirth())
-//            .processor(processBirthCoupon())
-//            .writer(writeProcessedBirthMembers())
-//            .build();
-//    }
-//
-//    /**
-//     * 해당 월의 생일인 Member 읽기 - read
-//     */
-//    @Bean
-//    public RepositoryItemReader<Member> readMemberBirth() {
-//
-//        int currentMonth = LocalDate.now().getMonthValue();
-//        String formattedMonth = String.format("%02d", currentMonth);
-//
-//        return new RepositoryItemReaderBuilder<Member>()
-//            .name("checkBirthMember")
-//            .pageSize(10)
-//            .methodName("findAllMembersByBirthMonth")
-//            .arguments(formattedMonth)
-//            .repository(memberRepository)
-//            .sorts(Map.of("id", Direction.ASC))
-//            .build();
-//    }
-//
-//    /**
-//     * 해당 월의 생일자에게 각각 쿠폰 생성 - processor
-//     */
-//    @Bean
-//    public ItemProcessor<Member, Member> processBirthCoupon() {
-//
-//        return item -> {
-//            if (item.getBirth() == null) {
-//                log.warn("Skipping Member due to missing or invalid birth data: {}", item);
-//                return null;
-//            }
-//            log.info("Processing Member with ID : {}, Birth Date : {}", item.getId(), item.getBirth());
-//            userCouponService.createBirthCoupon(item);
-//            return item;
-//        };
-//    }
-//
-//    /**
-//     * 해당 월의 생일자 쿠폰함에 넣어주기 - writer
-//     */
-//    @Bean
-//    public ItemWriter<Member> writeProcessedBirthMembers() {
-//        return items -> {
-//            for (Member item : items) {
-//                log.info("Writing Member with ID : {}", item.getId());
-//            }
-//        };
-//    }
 }
