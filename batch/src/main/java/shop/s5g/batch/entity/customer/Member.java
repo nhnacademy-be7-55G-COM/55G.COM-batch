@@ -52,4 +52,5 @@ public class Member {
     private Long point;
 
     private String paycoIdNo;
+
 }

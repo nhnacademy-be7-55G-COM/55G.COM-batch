@@ -31,16 +31,15 @@ public class UserCouponQuerydslRepositoryImpl extends QuerydslRepositorySupport 
     @Override
     public boolean hasBirthdayCoupon(Member member) {
 
-        return queryFactory
-            .select(couponTemplate.couponName)
+        Integer count = queryFactory
+            .selectOne()
             .from(userCoupon)
-            .innerJoin(coupon)
-            .on(userCoupon.userCouponPk.couponId.eq(coupon.couponId))
-            .innerJoin(couponTemplate)
-            .on(coupon.couponTemplate.couponTemplateId.eq(couponTemplate.couponTemplateId))
-            .where(userCoupon.member.eq(member)
-                .and(couponTemplate.couponName.containsIgnoreCase("Birth"))
-                .and(coupon.active.eq(true)))
-            .fetchOne() != null;
+            .join(userCoupon.coupon, coupon)
+            .join(coupon.couponTemplate, couponTemplate)
+            .where(userCoupon.userCouponPk.customerId.eq(member.getId())
+                .and(couponTemplate.couponName.containsIgnoreCase("Birth")))
+            .fetchFirst();
+
+        return count != null;
     }
 }

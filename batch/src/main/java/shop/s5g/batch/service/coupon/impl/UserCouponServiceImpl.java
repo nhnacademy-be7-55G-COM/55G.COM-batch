@@ -1,5 +1,7 @@
 package shop.s5g.batch.service.coupon.impl;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,7 +10,6 @@ import shop.s5g.batch.entity.coupon.Coupon;
 import shop.s5g.batch.entity.coupon.UserCoupon;
 import shop.s5g.batch.entity.customer.Member;
 import shop.s5g.batch.repository.coupon.UserCouponRepository;
-import shop.s5g.batch.service.coupon.CouponService;
 import shop.s5g.batch.service.coupon.UserCouponService;
 
 @Slf4j
@@ -16,7 +17,6 @@ import shop.s5g.batch.service.coupon.UserCouponService;
 @RequiredArgsConstructor
 public class UserCouponServiceImpl implements UserCouponService {
 
-    private final CouponService couponService;
     private final UserCouponRepository userCouponRepository;
 
     /**
@@ -25,15 +25,12 @@ public class UserCouponServiceImpl implements UserCouponService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createBirthCoupon(Member member) {
+    public void createBirthCoupon(Member member, Coupon coupon) {
 
-        if (userCouponRepository.hasBirthdayCoupon(member)) {
-            log.warn("Member with ID {} already has a birthday coupon. Skipping.", member.getId());
-            return;
-        }
+        LocalDateTime now = LocalDateTime.now();
+        YearMonth yearMonth = YearMonth.from(now);
+        LocalDateTime lastDayOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
 
-        Coupon coupon = couponService.createBirthCoupon();
-
-        userCouponRepository.save(new UserCoupon(member, coupon));
+        userCouponRepository.save(new UserCoupon(member, coupon, now, lastDayOfMonth));
     }
 }

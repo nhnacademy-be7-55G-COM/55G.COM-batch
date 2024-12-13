@@ -2,6 +2,7 @@ package shop.s5g.batch.schedule;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -27,18 +28,19 @@ public class BirthSchedule {
      * cron - 매 달 1일 자정 00시 00분 00초에 스케쥴 실행
      * @throws Exception
      */
-    @Scheduled(cron = "0 0 0 1 * *",zone = "Asia/Seoul")
+//    @Scheduled(cron = "0 0 0 1 * *",zone = "Asia/Seoul")
+    @Scheduled(cron = "*/30 * * * * *", zone = "Asia/Seoul")
     public void runBirthJob() throws Exception {
 
-      log.info("Start Birth Job");
+        log.info("Start Birth Job");
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
         String date = dateFormat.format(new Date());
 
         JobParameters jobParameters = new JobParametersBuilder()
             .addString("date", date)
             .toJobParameters();
 
-        jobLauncher.run(jobRegistry.getJob("couponJob"), jobParameters);
+        jobLauncher.run(jobRegistry.getJob("birthJob"), jobParameters);
     }
 }
