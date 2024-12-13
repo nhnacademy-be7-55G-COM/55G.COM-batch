@@ -10,7 +10,6 @@ import shop.s5g.batch.entity.coupon.Coupon;
 import shop.s5g.batch.entity.coupon.UserCoupon;
 import shop.s5g.batch.entity.customer.Member;
 import shop.s5g.batch.repository.coupon.UserCouponRepository;
-import shop.s5g.batch.service.coupon.CouponService;
 import shop.s5g.batch.service.coupon.UserCouponService;
 
 @Slf4j
@@ -18,7 +17,6 @@ import shop.s5g.batch.service.coupon.UserCouponService;
 @RequiredArgsConstructor
 public class UserCouponServiceImpl implements UserCouponService {
 
-    private final CouponService couponService;
     private final UserCouponRepository userCouponRepository;
 
     /**
@@ -27,14 +25,7 @@ public class UserCouponServiceImpl implements UserCouponService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createBirthCoupon(Member member) {
-
-        if (userCouponRepository.hasBirthdayCoupon(member)) {
-            log.warn("Member with ID {} already has a birthday coupon. Skipping.", member.getId());
-            return;
-        }
-
-        Coupon coupon = couponService.createBirthCoupon();
+    public void createBirthCoupon(Member member, Coupon coupon) {
 
         LocalDateTime now = LocalDateTime.now();
         YearMonth yearMonth = YearMonth.from(now);

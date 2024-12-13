@@ -39,5 +39,6 @@ public class Coupon {
     public Coupon(CouponTemplate couponTemplate, String couponCode) {
         this.couponTemplate = couponTemplate;
         this.couponCode = couponCode;
+        this.active = true;
     }
 }
